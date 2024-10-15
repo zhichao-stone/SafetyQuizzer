@@ -5,9 +5,10 @@
 ##### 1.1 Base Requirements
 
 ```
-python >= 3.9
-torch
-transformers
+python>=3.9
+torch>=1.13.1
+transformers>=4.31.0,<4.35.0
+datasets>=2.14.0
 ```
 
 ##### 1.2 Requirements for LLM API
