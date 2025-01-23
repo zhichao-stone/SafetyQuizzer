@@ -32,47 +32,62 @@ def retrieve_events_by_search_words(search_words):
         page1 = 0
         count_bd = count_360 = count_sg = count_tt = 1
         page2 = 1
+        page3 = 1
         page4 = 0
         for i in range(3):
             result = list()
             current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # baidu
+            print(f"# Retrieve Baidu for page-{i}")
             url_bd = url_1.format(search_word,page1)
-            url_360 = url_2.format(search_word, page2)
-            url_sg = url_3.format(search_word, page2)
-            url_tt = url_4.format(search_word,page4)
-            page1 = page1 + 10
-            page2 = page2 + 1
-            page4 = page4 + 1
+            page1 += 10
             resp_bd = requests.get(url_bd, headers=Headers_bd)
-            resp_360 = requests.get(url_360, headers=Headers_360)
-            resp_sg = requests.get(url_sg, headers=Headers_bd)
-            resp_tt = requests.get(url_tt,headers=Headers_tt)
             titles_bd = re.findall(r"titleAriaLabel\":\"标题：(.*?)\"", resp_bd.text, re.S)
-            titles_360 = re.findall(r"rel=\"noopener\" title=\"(.*?)\">", resp_360.text, re.S)
-            titles_sg = re.findall(r"<h3 class=\"vr-title\">.*?>(.*?)</a>", resp_sg.text, re.S)
-            #titles_tt = re.findall(r"class=\"text-ellipsis text-underline-hover\">(.*?)</a>",resp_tt.text,re.S)
-            titles_tt = resp_tt.text
-            titles_tt = json.loads(titles_tt)
             for title_bd in titles_bd:
                 result.append([search_word, current_time, 'baidu',count_bd, title_bd])
                 count_bd = count_bd + 1
+
+            # 360
+            print(f"# Retrieve 360 for page-{i}")
+            url_360 = url_2.format(search_word, page2)
+            page2 += 1
+            resp_360 = requests.get(url_360, headers=Headers_360)
+            titles_360 = re.findall(r"rel=\"noopener\" title=\"(.*?)\">", resp_360.text, re.S)
             for title_360 in titles_360:
                 title_360 = title_360.replace("&quot;", "")
                 result.append([search_word, current_time, 'liulanqi360', count_360, title_360])
                 count_360 = count_360 + 1
+
+            # sogo
+            print(f"# Retrieve Sogou for page-{i}")
+            url_sg = url_3.format(search_word, page2)
+            page3 += 1
+            resp_sg = requests.get(url_sg, headers=Headers_bd)
+            titles_sg = re.findall(r"<h3 class=\"vr-title\">.*?>(.*?)</a>", resp_sg.text, re.S)
             for title_sg in titles_sg:
                 title_sg = title_sg.replace("<em>", "").replace("<!--red_beg-->", "").replace("<!--red_end--></em>", "")
                 result.append([search_word, current_time, 'sougou', count_sg, title_sg])
                 count_sg = count_sg + 1
+
+            # toutiao
+            print(f"# Retrieve Toutiao for page-{i}")
+            url_tt = url_4.format(search_word,page4)
+            page4 = page4 + 1
+            resp_tt = requests.get(url_tt,headers=Headers_tt)
+            titles_tt = resp_tt.text
+            titles_tt = json.loads(titles_tt)
             for item in titles_tt["data"]:
                 title_tt = item["keyword"]
                 result.append([search_word, current_time, 'jinritoutiao', count_tt, title_tt])
                 count_tt = count_tt + 1
-            time.sleep(2)
+            
+            time.sleep(2 + random.random())
 
             for item in result:
                 search_word, search_time, platform, count, title = item
                 events.append(title)
+
     return events
 
 
@@ -90,11 +105,12 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--types", type=str, nargs="*", choices=all_types)
+    parser.add_argument("--path", type=str, default="example_database/example_events.json")
     args = parser.parse_args()
     retrieve_categories = args.types
+    path = args.path
 
-    path = "example_database/example_events.json"
-    example_events = load_json(path)
+    example_events = load_json(path) if os.path.exists(path) else {}
     for category in retrieve_categories:
         events = retrieve_events_by_category(category)
         if category not in example_events:

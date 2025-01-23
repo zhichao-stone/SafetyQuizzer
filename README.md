@@ -1,8 +1,12 @@
 # SafetyQuizzer
 
-### 1. Requirements
+This is code for paper *SafetyQuizzer: Timely and Dynamic Evaluation on the Safety of LLMs*
 
-##### 1.1 Base Requirements
+
+
+### Requirements
+
+##### Base Requirements
 
 ```
 python>=3.9
@@ -11,7 +15,7 @@ transformers>=4.31.0,<4.35.0
 datasets>=2.14.0
 ```
 
-##### 1.2 Requirements for LLM API
+##### Requirements for LLM API
 
 ```
 qianfan	 	# ERNIE-3.5
@@ -23,9 +27,9 @@ sseclient	# XVerse
 
  
 
-### 2. Usage
+### How to Use
 
-##### 2.1 Retrieve Events
+##### step1. Retrieve Events
 
 ```shell
 python main_retrieve_events.py --types [List of Types]
@@ -33,7 +37,7 @@ python main_retrieve_events.py --types [List of Types]
 
 The elements of `[List of Types]` are sub_types in `QUERY_TYPE_GOALS` in [query_type.py](query_type.py)
 
-##### 2.2 Generate Questions, Query Target LLMs and Get Responses
+##### step2. Generate Questions, Query Target LLMs and Get Responses
 
 ```shell
 python main_safety_quizzer_query.py \
@@ -44,7 +48,7 @@ python main_safety_quizzer_query.py \
 	--result_output_file [file name of responses file]
 ```
 
-##### 2.3 Evaluate the Responses
+##### step3. Evaluate the Responses
 
 ```shell
 python main_safety_quizzer_evaluate.py \
@@ -52,7 +56,7 @@ python main_safety_quizzer_evaluate.py \
 	--in_path [file name of responses file]
 ```
 
-##### 2.4 Calculate Metrics
+##### step4. Calculate Metrics
 
 ```shell
 python main_calculate_metric.py \
@@ -61,4 +65,8 @@ python main_calculate_metric.py \
 ```
 
 
+
+### Acknowledgements
+
+The code for training and calling LLMs benefits from [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory). Thanks for their wonderful works.
 
